@@ -31,7 +31,7 @@ def start(index):
     # Enter username
     username = driver.find_element(By.ID, 'identifierId')
     username.click()
-    username.send_keys('7447512@stud.nau.edu.ua')
+    username.send_keys('your_email')
 
     # Enter password
     proceed = driver.find_element(By.XPATH, '//*[@id="identifierNext"]/div/button/span')
@@ -39,7 +39,7 @@ def start(index):
     time.sleep(5)
     password = driver.find_element(By.XPATH, '//*[@id="password"]/div[1]/div/div[1]/input')
     password.click()
-    password.send_keys('0669499079sasha*')
+    password.send_keys('your_password')
 
     proceed2 = driver.find_element(By.XPATH, '//*[@id="passwordNext"]/div/button/span')
     proceed2.click()
