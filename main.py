@@ -5,6 +5,7 @@ import time
 from webdriver_manager.chrome import ChromeDriverManager
 import config as cf
 from selenium.webdriver.common.by import By
+from data import class_schedule, monday_schedule
 
 
 def start():
@@ -25,40 +26,93 @@ def start():
     click_element(driver, By.XPATH, '//*[@id="passwordNext"]/div/button/span')
     time.sleep(5)
 
+    # Choose class
+
+    class_number = get_class_number(class_schedule)
+    current_day_schedule = get_schedule_for_current_day()
+
+    target_class = find_target_class(current_day_schedule, class_number)
+
     # Find and enter the needed class
+    choose_class(driver, target_class)
 
-    # For now, it manually added class name that we need to click
-    target_class = "2023 (осінь) Завадостійке кодування та захист біомедичної інфор"
+    # Click on button to join Meet conference
+    time.sleep(2)
 
+    # Prees Join button
+    press_meet_button(driver)
+
+    # Switch to tab with conference
+    change_tab(driver)
+
+    # Off mic and video
+    off_mic_video(driver)
+
+    # Click on Join button
+    press_last_join_button(driver)
+
+    time.sleep(5000)
+
+
+def find_target_class(current_day_schedule, class_number):
+    if current_day_schedule is not None and class_number is not None:
+        for class_info in current_day_schedule:
+            if class_number in class_info:
+                target_class = class_info[class_number]
+                if target_class is not None:
+                    break
+    return target_class
+
+
+def choose_class(driver, target_class):
     elements = driver.find_elements(By.CLASS_NAME, "YVvGBb.z3vRcc-ZoZQ1")
-
-    # Parser
-    # element_text_list = [element.text for element in elements]
 
     for element in elements:
         if element.text == target_class:
             element.click()
             break
 
-    # Click on button to join Meet conference
+
+def press_last_join_button(driver):
+    join_button = find_element(driver, By.XPATH,
+                               '//*[@id="yDmH0d"]/c-wiz/div/div/div[15]/div[3]/div/div[2]/div[4]/div/div/div['
+                               '2]/div[1]/div[2]/div[1]/div[1]')
+    join_button.click()
+
+
+def change_tab(driver):
+    driver.switch_to.window(driver.window_handles[1])
     time.sleep(2)
+
+
+def press_meet_button(driver):
     meet_button = find_element(driver, By.XPATH,
                                '//*[@id="yDmH0d"]/c-wiz[2]/div[2]/div/div[7]/div[2]/aside/div/div[1]/div/div[2]/div/a')
     meet_button.click()
 
-    # Switch to tab with conference
-    driver.switch_to.window(driver.window_handles[1])
-    time.sleep(2)
 
-    off_mic_video(driver)
+def get_schedule_for_current_day():
+    # current_day = datetime.datetime.now().strftime('%A')
+    current_day = "Monday"
+    schedule_name = f'{current_day.lower()}_schedule'
 
-    # Click on Join button
-    join_button = find_element(driver, By.XPATH,
-                                      '//*[@id="yDmH0d"]/c-wiz/div/div/div[15]/div[3]/div/div[2]/div[4]/div/div/div['
-                                      '2]/div[1]/div[2]/div[1]/div[1]')
-    join_button.click()
+    if schedule_name in globals():
+        return globals()[schedule_name]
+    else:
+        return None
 
-    time.sleep(5000)
+
+def get_class_number(schedule):
+    # current_time = datetime.datetime.now(pytz.timezone('Europe/Kiev')).strftime('%H:%M')
+    current_time = "11:41"
+    for class_info in schedule:
+        start_time = class_info['start_time']
+        end_time = class_info['end_time']
+
+        if start_time <= current_time <= end_time:
+            return class_info['class_number']
+
+    return None
 
 
 def off_mic_video(driver):
