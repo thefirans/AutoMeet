@@ -15,4 +15,4 @@ What already done:
  - Add auto disconnect from calls (low priority)
  - Make code more flexible for unusual cases (more work with elif)
 
-### Help and advices are welcome :)
+### Help and advices are welcome ;)
