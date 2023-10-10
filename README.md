@@ -15,7 +15,7 @@ What already done:
  - [ ] Add auto disconnect from calls (high priority)
  - [ ] Make code more flexible for unusual cases (more work with elif)
  - [ ] Refactor function and variable names (low priority)
- - [ ] Create a global loop to switch to the next pair after leaving the conference. Alternatively, you can achieve this with recursion
+ - [ ] Create a global loop to switch to the next pair after leaving the conference
  - [ ] Implement launching from a server on a virtual machine running on Linux (more like concept)
  - [ ] Implement an interface in the Telegram bot (more like concept)
 
