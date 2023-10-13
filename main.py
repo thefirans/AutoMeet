@@ -1,4 +1,6 @@
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import threading
 import time
@@ -13,21 +15,22 @@ def start():
 
     driver = run_driver()
 
-    driver.get(
-        "https://accounts.google.com/ServiceLogin/identifier?service=classroom&passive=1209600&continue=https%3A%2F%2Fclassroom.google.com%2F&followup=https%3A%2F%2Fclassroom.google.com%2F&emr=1&flowName=GlifWebSignIn&flowEntry=AddSession")
+    driver.get("https://accounts.google.com/ServiceLogin/identifier?service=classroom&passive=1209600&continue=https"
+               "%3A%2F%2Fclassroom.google.com%2F&followup=https%3A%2F%2Fclassroom.google.com%2F&emr=1&flowName"
+               "=GlifWebSignIn&flowEntry=AddSession")
 
     # Enter username
-    enter_text(driver, By.ID, 'identifierId', username)
-    click_element(driver, By.XPATH, '//*[@id="identifierNext"]/div/button/span')
-    time.sleep(5)
+    enter_text(driver, By.ID, 'identifierId', username)                             # enter login/email
+    click_element(driver, By.XPATH, '//*[@id="identifierNext"]/div/button/span')    # click next button
 
     # Enter password
-    enter_text(driver, By.XPATH, '//*[@id="password"]/div[1]/div/div[1]/input', password)
-    click_element(driver, By.XPATH, '//*[@id="passwordNext"]/div/button/span')
-    time.sleep(5)
+    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="passwordNext"]/div/button/span')))
+    enter_text(driver, By.XPATH, '//*[@id="password"]/div[1]/div/div[1]/input', password)      # enter password
+    click_element(driver, By.XPATH, '//*[@id="passwordNext"]/div/button/span')                 # click next button
 
     # Choose class
-
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "YVvGBb.z3vRcc-ZoZQ1")))
+    # week_number = get_week_number()
     class_number = get_class_number(class_schedule)
     current_day_schedule = get_schedule_for_current_day()
 
@@ -35,11 +38,9 @@ def start():
 
     # Find and enter the needed class
     choose_class(driver, target_class)
+    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div[2]/div/div[7]/div[2]/aside/div/div[1]/div/div[2]/div/a')))
 
-    # Click on button to join Meet conference
-    time.sleep(2)
-
-    # Prees Join button
+    # Press Join button
     press_meet_button(driver)
 
     # Switch to tab with conference
@@ -49,6 +50,10 @@ def start():
     off_mic_video(driver)
 
     # Click on Join button
+    WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="yDmH0d"]/c-wiz/div/div/div['
+                                                                               '15]/div[3]/div/div[2]/div['
+                                                                               '4]/div/div/div[''2]/div[1]/div['
+                                                                               '2]/div[1]/div[1]')))
     press_last_join_button(driver)
 
     time.sleep(5000)
@@ -71,6 +76,15 @@ def choose_class(driver, target_class):
         if element.text == target_class:
             element.click()
             break
+
+
+def get_week_number(datetime):
+    today = datetime.date.today()
+    start_date = datetime.date(today.year, 9, 1)
+    delta_days = (today - start_date).days
+    week_number = (delta_days // 7) % 2 + 1
+
+    return week_number
 
 
 def press_last_join_button(driver):
@@ -120,10 +134,7 @@ def off_mic_video(driver):
     print(elements)
 
     elements[0].click()
-    time.sleep(0.5)
-
     elements[1].click()
-    time.sleep(0.5)
 
 
 def run_driver():
@@ -131,8 +142,6 @@ def run_driver():
     options.binary_location = r"C:/Program Files/Google/Chrome/Application/chrome.exe"
     options.add_argument("start-maximized")
     options.add_argument("--disable-extensions")
-
-    # Argument 1 to allow, 2 to block
     options.add_experimental_option("prefs", {
         "profile.default_content_setting_values.media_stream_mic": 1,
         "profile.default_content_setting_values.media_stream_camera": 1,
