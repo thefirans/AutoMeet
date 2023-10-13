@@ -10,7 +10,7 @@ What already done:
 - Store timetable and schedule for each day and each week
 
  TODO:
- - [ ] Replace all dumb time.sleep() with something smarter
+ - [x] Replace all dumb time.sleep() with something smarter
  - [x] Change schedule every second week (medium priority)
  - [ ] Add auto disconnect from calls (high priority)
  - [ ] Make code more flexible for unusual cases (more work with elif)
